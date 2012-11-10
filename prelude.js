@@ -1,3 +1,5 @@
+// ADD TYPE SIGNATURES
+// Add definintion docs at top explaining autocurry
 // Helpers
 argsToList = function(x){
 	return Array.prototype.slice.call(x);
@@ -28,7 +30,7 @@ log2 = function(one, two) {
 }.autoCurry();
 
 unfoldr = function(step, seed) {
-  var output  = [], result;
+  var output = [], result;
   
   while (result = step(seed)) {
     output.push(result[0]);
@@ -212,13 +214,13 @@ setVal = function(attribute, x, val) {
 }.autoCurry();
 
 setVals = function(obj1, obj2) {
-  var target = {}
+  var target = {};
   for(k in obj1) { target[k] = obj1[k].toFunction()(obj2); }
 	return target;
 }.autoCurry();
 
 getVal = function(attribute, x) {
-	return function(){ return x[attribute]; }
+	return function(){ return x[attribute]; };
 }.autoCurry();
 
 merge = function(x,y) {
@@ -272,7 +274,7 @@ sum = reduce('+', 0);
 div = function(x,y){ return x / y; }
 
 average = function(xs) {
-	return parseFloat(div(sum(xs), xs.length));
+	return parseFloat(div(sum(xs), xs.length), 10);
 }
 
 
