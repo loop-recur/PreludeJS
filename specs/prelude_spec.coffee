@@ -4,8 +4,9 @@ require('../prelude')
 describe('preludeJS', () ->
   describe('helpers', () ->
     describe('argsList', ()->
-      xit('turns args into a list', () ->
-        list = argsToList('a', 'b', 'c')
+      it('turns args into a list', () ->
+        #TODO
+        list = argsToList(['a', 'b', 'c'])
         expect(list.length).toEqual(3)
       )
     )
@@ -22,6 +23,7 @@ describe('preludeJS', () ->
         expect(isObj([])).toBeFalsy()
         expect(isObj({})).toBeTruthy()
       )
+
     )
 
     describe('nTimes', ()->
@@ -109,6 +111,11 @@ describe('preludeJS', () ->
       )
     )
 
+    describe('rest', ()->
+      #TODO
+
+    )
+
     describe('last', ()->
       it('returns last elem of an array', ()->
         expect(last([2, 'x', 3])).toEqual(3)
@@ -138,6 +145,11 @@ describe('preludeJS', () ->
       it('returns empty array if supplied empty array', ()->
         expect(groupsOf(4, [])).toEqual([])
       )
+    )
+
+    describe('zipWith', ()->
+      #TODO
+
     )
 
     describe('uniq', ()->
