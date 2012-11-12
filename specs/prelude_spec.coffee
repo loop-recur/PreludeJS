@@ -323,15 +323,15 @@ describe('preludeJS', () ->
 
   describe('Conditional', ()->
     describe('when', ()->
-      xit('takes a predicate function and another function, when predicate function returns true it applies other function to args', ()->
-        #TODO: Unexpected When
-        true_func = () -> true
-        false_func = () -> true
-        my_func = () -> 'linux is cool'
+      xit('takes a predicate function and other function, when predicate function returns true it applies other function to args', ()->
+        #TODO: when function conflicts with coffeescript when keyword, wont run spec
+        #true_func = () -> true
+        #false_func = () -> false
+        #my_func = () -> 'lamp'
         #output = when(true_func, my_func)()
-        expect(output).toEqual('linux is cool')
+        #expect(output).toEqual('lamp')
         #output = when(false_func, my_func)()
-        expect(output).toBeUndefined()
+        #expect(output).toBeUndefined()
       )
     )
 
