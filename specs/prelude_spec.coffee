@@ -1,7 +1,22 @@
-require('../../FunctionalJS/functional').expose()
-require('../prelude')
+functional = require('../../FunctionalJS/functional')
+functional.expose()
+
+prelude = require('../prelude')
+prelude.expose()
 
 describe('preludeJS', () ->
+  it('loads and requires properly', ->
+    expect(prelude).not.toBeUndefined()
+    expect(typeof prelude.argsToList).toEqual('function')
+  )
+  
+  describe('expose', ->
+    it('can attach functions to the global namespace', ->
+      expect(typeof prelude.expose).toEqual('function')
+      expect(typeof argsToList).toEqual('function')
+    )
+  )
+
   describe('helpers', () ->
     describe('isArray', ()->
       it('tests for Array', ()->
@@ -10,8 +25,8 @@ describe('preludeJS', () ->
       )
     )
 
-    describe('isObj', ()->
-      it('tests for Object', ()->
+    describe('isObj', () ->
+      it('tests for Object', () ->
         expect(isObj([])).toBeFalsy()
         expect(isObj({})).toBeTruthy()
       )
@@ -478,6 +493,7 @@ describe('preludeJS', () ->
       it('averages an array of values and returns a float', ()->
         expect(average([4,8])).toEqual(6.0)
         expect(average([0,4,8])).toEqual(6.0)
+
       )
     )
 
