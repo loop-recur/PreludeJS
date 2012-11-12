@@ -1,22 +1,20 @@
-// ADD TYPE SIGNATURES
-// Add definintion docs at top explaining autocurry
 // Helpers
-//+ argsToList :: Arguments -> [a] 
-argsToList = function(x){
-	return Array.prototype.slice.call(x);
-}
-
-//+ isArray :: a -> Bool
+//+ isArray :: a -> Boolean
 isArray = function(obj) {
 	return (obj && obj.constructor == Array);
 }
 
-//+ isObj :: a -> Bool
+//+ isObj :: a -> Boolean
 isObj = function(obj) {
 	return (typeof obj == "object" && !isArray(obj));
 }
 
-//+ Integer -> (? -> a) -> [a]
+//+ isNumber :: a -> Boolean
+isNumber = function(n) {
+  return !isNaN(parseFloat(n)) && isFinite(n);
+};
+
+//+ nTimes :: Integer -> (-> a) -> [a]
 nTimes = function(times, fun) {
 	var result = [];
 	for(var i=0;i<times;i++ ){ result = cons(fun(), result); }
@@ -35,22 +33,9 @@ log2 = function(one, two) {
 	return log(two);
 }.autoCurry();
 
-//+ unfolder ::
-unfoldr = function(step, seed) {
-  var output = [], result;
-  
-  while (result = step(seed)) {
-    output.push(result[0]);
-    seed = result[1];
-  }
-  
-  return output;
-}.autoCurry();
-
 
 
 // Array
-
 //+ take :: Integer -> [a] -> [a]
 take = function(n, xs) {
 	return xs.slice(0, n);
@@ -62,23 +47,22 @@ drop = function(n, xs) {
 }.autoCurry();
 
 //+ unshift :: [a] -> b -> [b,a]
-unshift = function(xs, other) {
-	return other.concat(xs);
+unshift = function(xs, x) {
+	return x.concat(xs);
 }.autoCurry();
 
-//+ cons :: [a] -> b -> [a,b]
-cons = function(xs, other) {
-	return [xs].concat(other);
+//+ cons :: a -> [b] -> [a,b]
+cons = function(x, xs) {
+	return [x].concat(xs);
 }.autoCurry();
 
-//+ concat :: [a] -> b -> [a,b]
-concat = function(xs, other) {
-	return xs.concat(other);
+//+ concat :: [a] -> [b] -> [a,b]
+concat = function(xs, ys) {
+	return xs.concat(ys);
 }.autoCurry();
 
 //+ first :: [a] -> a
 first = function(xs) {
-	if(!xs) throw("Calling first on non-array");
 	return xs[0];
 };
 
@@ -103,8 +87,12 @@ groupsOf = function(n, xs) {
 	return cons(take(n, xs), groupsOf(n, drop(n,xs)));
 }.autoCurry();
 
-zipWith = function(xs, ys) {
-  return map(function(f){ return map(f, ys); }, xs);
+//+ zipWith :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith = function(f, xs, ys) {
+  f = f.toFunction();
+  return xs.reduce(function(result, x, i){
+    return result.concat(f(x, ys[i]));
+  }, []);
 }.autoCurry();
 
 //+ uniq :: [a] -> [a] 
@@ -114,7 +102,7 @@ uniq = function(xs) {
 	return result;
 }
 
-//+ uniqBy :: () -> [a] 
+//+ uniqBy :: (a -> b) -> [a] -> [a]
 uniqBy = function(fun, xs) {
 	var result = [], len = xs.length, fun = fun.toFunction();
 	for(var i=0;i<len;i++ ) {
@@ -128,24 +116,31 @@ uniqBy = function(fun, xs) {
 //+ reverse :: [a] -> [a]
 reverse = function(xs) {
   var mempty = (typeof xs == "string") ? "" : [];
-  return reduce(function(x, acc){ return acc.concat(x); }, mempty, xs);
+  if(isArray(xs)) {
+    //destructive
+    return xs.reverse();
+  } else {
+    return reduce(function(x, acc){ return acc.concat(x); }, mempty, xs);
+  }
 }.autoCurry();
 
 //+ sort :: [a] -> [a]
 sort = function(xs) {
-  return xs.sort();
+  //destructive
+  is_num_array = reduce(andand, true, map(isNumber,xs));
+  num_sort_func = function(a,b) {return a - b;};
+  return is_num_array ? xs.sort(num_sort_func) : xs.sort();
 }
 
-//+ element :: [a] -> b -> Bool
+//+ element :: [a] -> b -> Boolean
 element = function(arr, x) {
-	return arr.indexOf(x) >= 0
+	return arr.indexOf(x) >= 0;
 }.autoCurry();
 
 //+ flatten :: [[a]] -> [a]
 flatten = reduce(function(a,b){return a.concat(b);}, []);
 
-// altered from prototype
-//+ sortBy ::
+//+ sortBy :: (a -> b) -> [a] -> [a]
 sortBy = function(fun, xs) {
 	var _sortBy = function(iterator, xs, context) {
 	  return map('.value', map(function(value, index) {
@@ -162,7 +157,7 @@ sortBy = function(fun, xs) {
 	return _sortBy(f, xs);
 }.autoCurry();
 
-//+ groupBy :: () -> [a] -> {false: [a], true: [a]}
+//+ groupBy :: (a -> Boolean) -> [a] -> {false: [a], true: [a]}
 groupBy = function(fun, xs) {
 	var f = fun.toFunction();
 	var _makeHash = function(obj, x) {
@@ -175,11 +170,6 @@ groupBy = function(fun, xs) {
 	return reduce(_makeHash, {}, xs);
 }.autoCurry();
 
-
-//+ filterByProperty ::
-filterByProperty = function(prop, val, xs) {
-	return compose(first, filter(function(p){return p[prop] == val}))(xs);
-}.autoCurry();
 
 
 
@@ -194,7 +184,7 @@ split = function(token, xs) {
 	return xs.split(token);
 }.autoCurry();
 
-//+ test :: RegEx -> String -> Bool
+//+ test :: RegEx -> String -> Boolean
 test = function(expr, x) {
 	return expr.test(x);
 }.autoCurry();
@@ -212,31 +202,31 @@ replace = function(pattern, sub, str) {
 
 
 // Conditional
-//+ when :: Bool -> (? -> a) -> a
+//+ when :: Boolean -> (? -> a) -> a
 when = function(pred, f) {
 	return function() {
 		if(pred.apply(this, arguments)) return f.apply(this, arguments);
 	}
 }.autoCurry();
 
-//+ ifelse :: Bool -> (? -> a) -> (? -> b) -> a|b
+//+ ifelse :: (-> Boolean) -> (-> a) -> (-> b) -> a|b
 ifelse = function(pred, f, g) {
 	return function() {
 		return pred.apply(this, arguments) ? f.apply(this, arguments) : g.apply(this, arguments);
 	}
 }.autoCurry();
 
-//+ negate :: Bool -> Bool
+//+ negate :: Boolean -> Boolean
 negate = function(bool) {
 	return !bool;
 }
 
-//+ andand :: a -> b -> Bool 
+//+ andand :: a -> b -> Boolean
 andand = function(x, y) {
   return x && y;
 }.autoCurry();
 
-//+ oror :: a -> b -> Bool
+//+ oror :: a -> b -> Boolean
 oror = function(x, y) {
   return x || y;
 }.autoCurry();
@@ -248,13 +238,6 @@ oror = function(x, y) {
 setVal = function(attribute, x, val) {
 	x[attribute] = val;
 	return val;
-}.autoCurry();
-
-//+ setVals ::
-setVals = function(obj1, obj2) {
-  var target = {};
-  for(k in obj1) { target[k] = obj1[k].toFunction()(obj2); }
-	return target;
 }.autoCurry();
 
 //+ getVal :: String -> Object -> a
@@ -277,7 +260,7 @@ merge = function(x,y) {
 	return target;
 }.autoCurry();
 
-//+ unionWith :: () -> Object -> Object -> Object
+//+ unionWith :: (a -> b -> c) -> Object -> Object -> Object
 unionWith = function(f, x, y) {
   f = f.toFunction();
 	var target = {};
@@ -302,7 +285,7 @@ unionWith = function(f, x, y) {
 
 
 // Math
-//+ random :: Integer -> Integer
+//+ random :: Integer-> Integer
 random = function(i) {
 	return Math.floor(Math.random()*i);
 }
@@ -320,7 +303,8 @@ div = function(x,y){ return x / y; }
 
 //+ average :: [Number] -> Number
 average = function(xs) {
-	return parseFloat(div(sum(xs), xs.length), 10);
+  var zerolessArr = filter('!==0', xs);
+	return div(sum(zerolessArr), zerolessArr.length);
 }
 
 
@@ -331,10 +315,3 @@ repeat = function(arg, n) {
 	return nTimes(n, id.curry(arg));
 }.autoCurry();
 
-//+ sleep :: Integer -> _
-sleep = function(millis) {
-	var date = new Date();
-	var curDate = null;
-	do { curDate = new Date(); }
-	while(curDate-date < millis);
-}

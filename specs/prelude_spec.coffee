@@ -3,14 +3,6 @@ require('../prelude')
 
 describe('preludeJS', () ->
   describe('helpers', () ->
-    describe('argsList', ()->
-      it('turns args into a list', () ->
-        #TODO
-        list = argsToList(['a', 'b', 'c'])
-        expect(list.length).toEqual(3)
-      )
-    )
-
     describe('isArray', ()->
       it('tests for Array', ()->
         expect(isArray([])).toBeTruthy()
@@ -23,33 +15,52 @@ describe('preludeJS', () ->
         expect(isObj([])).toBeFalsy()
         expect(isObj({})).toBeTruthy()
       )
+    )
 
+    describe('isNumber', ()->
+      it('test for float or integer',()->
+        expect(isNumber(3)).toBeTruthy()
+        expect(isNumber(-1)).toBeTruthy()
+        expect(isNumber(0.42)).toBeTruthy()
+        expect(isNumber(-0.42)).toBeTruthy()
+        expect(isNumber(-1.42)).toBeTruthy()
+        expect(isNumber(1.42)).toBeTruthy()
+        expect(isNumber({})).toBeFalsy()
+        expect(isNumber('a')).toBeFalsy()
+        expect(isNumber([])).toBeFalsy()
+      )
     )
 
     describe('nTimes', ()->
-      it('runs a function n times and returns output of function to list', ()->
+      it('runs a function n times and returns output n times in list', ()->
         returnHellos = () -> "hello"
         list = nTimes(3, returnHellos)
         expect(list).toEqual(['hello', 'hello', 'hello'])
+      )
+
+      it('runs a function n times and returns output n times in list', ()->
+        obj = {prop: 2}
+        returnObj = () -> obj
+        list = nTimes(3, returnObj)
+        expect(list).toEqual([obj,obj,obj])
+      )
+
+      it('returns undefined n times when value is not returned from function', ()->
+        expect(nTimes(2, (()->))).toEqual([undefined, undefined])
       )
     )
 
     describe('log', ()->
       it('logs the input to STDOUT and returns input as output', ()->
-        output = log('see me in STDOUT')
-        expect(output).toEqual('see me in STDOUT')
+        output = log('.')
+        expect(output).toEqual('.')
       )
     )
 
     describe('log2', ()->
       it('logs a message and input, returns input as output', ()->
-        output = log2('message', {})
-        expect(output).toEqual({})
-      )
-    )
-
-    describe('unfoldr', ()->
-      xit('UNFOLDR', ()->
+        output = log2('.', '.')
+        expect(output).toEqual('.')
       )
     )
   )
@@ -84,20 +95,32 @@ describe('preludeJS', () ->
     )
 
     describe('unshift', ()->
-      it('adds first arg to end of an array and returns new flattened array', ()->
+      it('adds second arg to end of an array', ()->
         expect(unshift(['x'],[2])).toEqual([2,'x'])
+      )
+
+      it('flattens array', ()->
+        expect(unshift(['x'],[2])).not.toEqual([2,['x']])
       )
     )
 
     describe('cons', ()->
-      it('adds an elem to the beginning of an unflattened array', ()->
+      it('adds an elem to the beginning of array', ()->
         expect(cons([1],[2])).toEqual([[1], 2])
+      )
+
+      it('doesnt flatten array', ()->
+        expect(cons([1],[2])).not.toEqual([[1], [2]])
       )
     )
 
     describe('concat', ()->
-      it('adds second arg to end of an array and returns new flattened array', ()->
+      it('adds second arg to end of an array', ()->
         expect(concat([2], 'x')).toEqual([2, 'x'])
+      )
+
+      it('flattens array', ()->
+        expect(concat(['x'],[2])).toEqual(['x',2])
       )
     )
 
@@ -112,8 +135,13 @@ describe('preludeJS', () ->
     )
 
     describe('rest', ()->
-      #TODO
+      it('drops the first element of the array and returns the rest of array', ()->
+        expect(rest([1,2,3])).toEqual([2,3])
+      )
 
+      it('returns an empty array if supplied with empty array', ()->
+        expect(rest([])).toEqual([])
+      )
     )
 
     describe('last', ()->
@@ -130,10 +158,14 @@ describe('preludeJS', () ->
       it('joins elems of an array with token supplied', ()->
         expect(join('-', ['h', 'e', 'l', 'l', 'o'])).toEqual('h-e-l-l-o')
       )
+
+      it('only joins array elements of type String', ()->
+        expect(join('-', [{}, []])).not.toEqual('{}-[]')
+      )
     )
 
     describe('groupsOf', ()->
-      it('takes number specified from array and returns a new array with arrays of elems with length of number specified', ()->
+      it('takes number and array and returns a new array with arrays of elements with length of number supplied for each inner array', ()->
         expect(groupsOf(3, [1,2,3,4,5,6])).toEqual([[1,2,3],[4,5,6]])
         expect(groupsOf(4, [1,2,3,4,5,6])).toEqual([[1,2,3,4],[5,6]])
       )
@@ -148,13 +180,18 @@ describe('preludeJS', () ->
     )
 
     describe('zipWith', ()->
-      #TODO
-
+      it('zips two lists with supplied function', ()->
+        zip_func = '+'
+        xs = [1,2,3]
+        ys = [1,2,3]
+        expect(zipWith(zip_func, xs, ys)).toEqual([2,4,6])
+      )
     )
 
     describe('uniq', ()->
       it('returns only unique values in array', ()->
         expect(uniq([1,2,2,3,3,3])).toEqual([1,2,3])
+        expect(uniq([1,1])).not.toEqual([1,1])
       )
 
       it('returns an empty array if supplied with empty array', ()->
@@ -163,22 +200,20 @@ describe('preludeJS', () ->
     )
 
     describe('uniqBy', ()->
-      #TODO
-      xit('takes a function that returns a value and returns a uniq array that satisifies the value', ()->
-        expect(uniqBy((()->4), [1,2,3,4,4,5])).toEqual([4])
+      it('takes a function to check array for function return value and returns unique array', ()->
+        expect(uniqBy('.id', [{id: 1},{id: 2},{id: 1}])).toEqual([{id:1},{id:2}])
       )
     )
 
     describe('reverse', ()->
-      #TODO: bug with string array
-      xit('reverses a string or an array of strings to a string', ()->
+      it('reverses a string or an array of strings to a string', ()->
         expect(reverse('linux')).toEqual('xunil')
-        expect(reverse(['l','i','n','u','x'])).toEqual([])
+        expect(reverse(['l','i','n','u','x'])).toEqual(['x','u','n','i','l'])
       )
 
-      #TODO: bug object 1 had no method concat
-      xit('reverses an array of non strings to an array', ()->
+      it('reverses an array of non strings to an array', ()->
         expect(reverse([1,2,3])).toEqual([3,2,1])
+        expect(reverse([1,2,{}])).toEqual([{},2,1])
       )
     )
 
@@ -188,14 +223,13 @@ describe('preludeJS', () ->
         expect(sort(['c','z','a'])).toEqual(['a','c','z'])
       )
 
-      #TODO: bug sorts by first num only
-      xit('', ()->
+      it('sorts numbers ascending', ()->
         expect(sort([1,100,2,78])).toEqual([1,2,78,100])
       )
 
       it('doesnt sort heterogenous values, must be equatable constraint', ()->
         expect(sort([1,100,'a'])).not.toEqual(['a',1,100])
-        expect(sort([1,100,'a'])).not.toEqual([1,'a',100])#'a' ascii char val 97
+        expect(sort([1,100,'a'])).not.toEqual([1,'a',100])
       )
     )
 
@@ -208,33 +242,25 @@ describe('preludeJS', () ->
     )
 
     describe('flatten', ()->
-      #TODO: behavior single nested only
       it('flattens single level deep nested arrays into a single array', ()->
-        single_nested_arrays = [[2,3], [1], [5]]
+        single_nested_arrays = [[2,3],[1],[5]]
         expect(flatten(single_nested_arrays)).toEqual([2,3,1,5])
-        double_nested_arrays = [1, [2], [[3]]]
-        expect(flatten(double_nested_arrays)).toEqual([1,2, [3]])
+        double_nested_arrays = [1,[2],[[3]]]
+        expect(flatten(double_nested_arrays)).toEqual([1,2,[3]])
       )
     )
 
     describe('sortBy', ()->
-      #TODO: function pulls '.name' out of something
-      xit('takes a sort function to sort array', ()->
-        sort_func = (a,b) -> a > b
-        expect(sortBy(sort_func, [3,1,2,34,12])).toEqual([1,2,3,12,34])
+      it('sorts by property', ()->
+        obj1= {name: 'alice'}
+        obj2 = {name: 'bob'}
+        expect(sortBy('.name', [obj2,obj1])).toEqual([obj1,obj2])
       )
     )
 
     describe('groupBy', ()->
       it('groups elems in array by predicate function and returns hash with keys true and false', ()->
         expect(groupBy('>4', [1,2,3,4,5,6,7,8])).toEqual({false: [1,2,3,4], true: [5,6,7,8]})
-      )
-    )
-
-    describe('filterByProperty', ()->
-      #TODO: Need to implement
-      xit('faf', ()->
-        filterByProperty('my_prop', 3, [{my_prop: 3}])
       )
     )
   )
@@ -321,14 +347,23 @@ describe('preludeJS', () ->
     describe('andand', ()->
       it('returns true if both args are true', ()->
         expect(andand(true, true)).toBeTruthy()
+        expect(andand(true, 'a')).toBeTruthy()
       )
 
       it('returns false if first arg is false', ()->
         expect(andand(false, true)).toBeFalsy()
+        expect(andand(0, true)).toBeFalsy()
+        expect(andand(null, true)).toBeFalsy()
+        expect(andand(undefined, true)).toBeFalsy()
+        expect(andand('', true)).toBeFalsy()
       )
 
       it('returns false if second arg is false', ()->
         expect(andand(true, false)).toBeFalsy()
+        expect(andand(true, 0)).toBeFalsy()
+        expect(andand(true, null)).toBeFalsy()
+        expect(andand(true, undefined)).toBeFalsy()
+        expect(andand(true, '')).toBeFalsy()
       )
     )
 
@@ -339,6 +374,10 @@ describe('preludeJS', () ->
 
       it('returns true if second arg is true', ()->
         expect(oror(false, true)).toBeTruthy()
+        expect(oror(0, true)).toBeTruthy()
+        expect(oror(null, true)).toBeTruthy()
+        expect(oror(undefined, true)).toBeTruthy()
+        expect(oror('', true)).toBeTruthy()
       )
 
       it('returns false if both args are false', ()->
@@ -360,10 +399,6 @@ describe('preludeJS', () ->
         return_val = setVal('prop', obj, 'set')
         expect(return_val).toEqual('set')
       )
-    )
-
-    describe('setVals', ()->
-      #TODO
     )
 
     describe('getVal', ()->
@@ -399,15 +434,21 @@ describe('preludeJS', () ->
     )
 
     describe('unionWith', ()->
-      #TODO
+      it('adds to values from keys of objects', ()->
+        obj1 = {first_name:'Bob', last_name:'Barker'}
+        obj2 = {first_name:'Happy', last_name:'Gilmore'}
+        expect(unionWith('+',obj1,obj2)).toEqual({first_name:'BobHappy', last_name:'BarkerGilmore'})
+      )
     )
   )
 
   describe('Math', ()->
     describe('random', ()->
-      it('returns a random value from 0 to n-1', ()->
-        expect(random(5)).toBeLessThan(5)
+      it('returns a random value from 0 to n', ()->
+        expect(random(5)).toBeLessThan(6)
         expect(random(5)).toBeGreaterThan(-1)
+        expect(random(-5)).toBeLessThan(1)
+        expect(random(-5)).toBeGreaterThan(-6)
       )
     )
 
@@ -434,10 +475,9 @@ describe('preludeJS', () ->
     )
 
     describe('average', ()->
-      #TODO: Bug if an array value is 0 based on length
       it('averages an array of values and returns a float', ()->
         expect(average([4,8])).toEqual(6.0)
-        #expect(average([0,4,8])).toEqual(6.0) 
+        expect(average([0,4,8])).toEqual(6.0)
       )
     )
 
@@ -449,10 +489,6 @@ describe('preludeJS', () ->
           expect(repeat([1], 3)).toEqual([[1], [1], [1]])
           expect(repeat({a:1}, 3)).toEqual([{a:1},{a:1},{a:1}])
         )
-      )
-
-      describe('sleep', ()->
-        #TODO
       )
     )
   )
