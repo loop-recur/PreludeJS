@@ -1,9 +1,22 @@
 require('../../FunctionalJS/functional').expose()
-require('../prelude')
+prelude = require('../prelude')
+prelude.expose()
 
 describe('preludeJS', () ->
+  it('loads and requires properly', ->
+    expect(prelude).not.toBeUndefined()
+    expect(typeof prelude.argsToList).toEqual('function')
+  )
+  
+  describe('expose', ->
+    it('can attach functions to the global namespace', ->
+      expect(typeof prelude.expose).toEqual('function')
+      expect(typeof argsToList).toEqual('function')
+    )
+  )
+
   describe('helpers', () ->
-    describe('argsList', ()->
+    describe('argsList', () ->
       it('turns args into a list', () ->
         #TODO
         list = argsToList(['a', 'b', 'c'])
@@ -11,22 +24,22 @@ describe('preludeJS', () ->
       )
     )
 
-    describe('isArray', ()->
-      it('tests for Array', ()->
+    describe('isArray', () ->
+      it('tests for Array', () ->
         expect(isArray([])).toBeTruthy()
         expect(isArray({})).toBeFalsy()
       )
     )
 
-    describe('isObj', ()->
-      it('tests for Object', ()->
+    describe('isObj', () ->
+      it('tests for Object', () ->
         expect(isObj([])).toBeFalsy()
         expect(isObj({})).toBeTruthy()
       )
 
     )
 
-    describe('nTimes', ()->
+    describe('nTimes', () ->
       it('runs a function n times and returns output of function to list', ()->
         returnHellos = () -> "hello"
         list = nTimes(3, returnHellos)
