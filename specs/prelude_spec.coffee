@@ -7,13 +7,13 @@ prelude.expose()
 describe('preludeJS', () ->
   it('loads and requires properly', ->
     expect(prelude).not.toBeUndefined()
-    expect(typeof prelude.argsToList).toEqual('function')
+    expect(typeof prelude.isArray).toEqual('function')
   )
   
   describe('expose', ->
     it('can attach functions to the global namespace', ->
       expect(typeof prelude.expose).toEqual('function')
-      expect(typeof argsToList).toEqual('function')
+      expect(typeof isArray).toEqual('function')
     )
   )
 
