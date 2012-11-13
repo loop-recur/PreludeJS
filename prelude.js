@@ -1,11 +1,12 @@
 ;(function (window, undefined) { 
-  // Detect free variables "exports" and "global", and create 
-  // "prelude" namespace
-  var freeExports = typeof exports == 'object' && exports
-    , freeGlobal = typeof global == 'object' && global
-    , functional = {}
-    , prelude = {}
+  var prelude = {} // create "prelude" namespace
     , oldPrelude = {}
+    , functional = {}
+      
+      // Detect free variables "exports" and "global", for applying
+      // different module load/require patterns in different environments
+    , freeExports = typeof exports == 'object' && exports
+    , freeGlobal = typeof global == 'object' && global
 
       // Helpers
       //+ isArray :: a -> Boolean
