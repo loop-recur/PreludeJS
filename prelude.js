@@ -325,9 +325,7 @@
       }.autoCurry()
      
 
-  // Add functions to the "functional" namespace,
-  // autoCurry() functions where appropriate
-  //prelude.argsToList = argsToList;
+  // Add functions to the "prelude" namespace,
   prelude.isArray = isArray;
   prelude.isObj = isObj;
   prelude.nTimes = nTimes;
