@@ -63,6 +63,11 @@ describe('preludeJS', () ->
       it('returns undefined n times when value is not returned from function', ()->
         expect(nTimes(2, (()->))).toEqual([undefined, undefined])
       )
+
+      it('can be partially applied', ->
+        returnHello = () -> 'hello'
+        expect(nTimes(3)(returnHello)).toEqual(['hello', 'hello', 'hello'])
+      )
     )
 
     describe('log', ()->
