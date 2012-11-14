@@ -82,6 +82,10 @@ describe('preludeJS', () ->
         output = log2('.', '.')
         expect(output).toEqual('.')
       )
+
+      it('can be patially applied', ->
+        expect(log2('one')('two')).toEqual('two')
+      )
     )
   )
 
@@ -98,6 +102,10 @@ describe('preludeJS', () ->
         none = take(5, [])
         expect(none).toEqual([])
       )
+
+      it('can be partially applied', ->
+        expect(take(3)([1, 2, 3, 4])).toEqual([1, 2, 3])
+      )
     )
 
     describe('drop', ()->
@@ -112,6 +120,10 @@ describe('preludeJS', () ->
         none = drop(0, [1,2])
         expect(none).toEqual([1,2])
       )
+
+      it('can be partially applied', ->
+        expect(drop(2)([1,2,3,4,5])).toEqual([3,4,5])
+      )
     )
 
     describe('unshift', ()->
@@ -121,6 +133,10 @@ describe('preludeJS', () ->
 
       it('flattens array', ()->
         expect(unshift(['x'],[2])).not.toEqual([2,['x']])
+      )
+
+      it('can be partially applied', ->
+        expect(unshift(['x'])([2])).toEqual([2, 'x'])
       )
     )
 
@@ -132,6 +148,10 @@ describe('preludeJS', () ->
       it('doesnt flatten array', ()->
         expect(cons([1],[2])).not.toEqual([[1], [2]])
       )
+
+      it('can be partially applied', ->
+        expect(cons([1])([2])).toEqual([[1],2])
+      )
     )
 
     describe('concat', ()->
@@ -141,6 +161,10 @@ describe('preludeJS', () ->
 
       it('flattens array', ()->
         expect(concat(['x'],[2])).toEqual(['x',2])
+      )
+
+      it('can be partially applied', ->
+        expect(concat([2], 'x')).toEqual([2, 'x'])
       )
     )
 
@@ -182,6 +206,10 @@ describe('preludeJS', () ->
       it('only joins array elements of type String', ()->
         expect(join('-', [{}, []])).not.toEqual('{}-[]')
       )
+
+      it('can be partially applied', ->
+        expect(join('-')(['foo', 'bar'])).toEqual('foo-bar')
+      )
     )
 
     describe('groupsOf', ()->
@@ -197,6 +225,10 @@ describe('preludeJS', () ->
       it('returns empty array if supplied empty array', ()->
         expect(groupsOf(4, [])).toEqual([])
       )
+      
+      it('can be partially applied', ->
+        expect(groupsOf(2, [1,2,3,4,5,6])).toEqual([[1,2],[3,4],[5,6]])
+      )
     )
 
     describe('zipWith', ()->
@@ -205,6 +237,12 @@ describe('preludeJS', () ->
         xs = [1,2,3]
         ys = [1,2,3]
         expect(zipWith(zip_func, xs, ys)).toEqual([2,4,6])
+      )
+
+      it('can be partially applied', ->
+        expect(zipWith('+')([1,2,3])([4,5,6])).toEqual([5,7,9])
+        expect(zipWith('+', [1,2,3])([4,5,6])).toEqual([5,7,9])
+        expect(zipWith('+')([1,2,3], [4,5,6])).toEqual([5,7,9])
       )
     )
 
@@ -222,6 +260,10 @@ describe('preludeJS', () ->
     describe('uniqBy', ()->
       it('takes a function to check array for function return value and returns unique array', ()->
         expect(uniqBy('.id', [{id: 1},{id: 2},{id: 1}])).toEqual([{id:1},{id:2}])
+      )
+
+      it('can be partially applied', ->
+        expect(uniqBy('.id')([{id:1},{id:2},{id:1}])).toEqual([{id:1},{id:2}])
       )
     )
 
@@ -259,6 +301,11 @@ describe('preludeJS', () ->
         expect(element([1,'b',3], 'b')).toBeTruthy()
         expect(element([1,2,3], 5)).toBeFalsy()
       )
+
+      it('can be partially applied', ->
+        expect(element([1,2,3])(1)).toBeTruthy()
+        expect(element([1,2,3])(5)).toBeFalsy()
+      )
     )
 
     describe('flatten', ()->
@@ -276,11 +323,22 @@ describe('preludeJS', () ->
         obj2 = {name: 'bob'}
         expect(sortBy('.name', [obj2,obj1])).toEqual([obj1,obj2])
       )
+      
+      it('can be partially applied', ->
+        obj1 = {id: 1}
+        obj2 = {id: 2}
+        obj3 = {id: 3}
+        expect(sortBy('.id')([obj3, obj1, obj2])).toEqual([obj1, obj2, obj3])
+      )
     )
 
     describe('groupBy', ()->
       it('groups elems in array by predicate function and returns hash with keys true and false', ()->
         expect(groupBy('>4', [1,2,3,4,5,6,7,8])).toEqual({false: [1,2,3,4], true: [5,6,7,8]})
+      )
+
+      it('can be partially applied', ->
+        expect(groupBy('>4')([1,2,3,4,5,6,7,8])).toEqual({false: [1,2,3,4], true: [5,6,7,8]})
       )
     )
   )
