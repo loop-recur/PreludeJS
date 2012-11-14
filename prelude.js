@@ -1,12 +1,14 @@
 ;(function (window, undefined) { 
   var prelude = {} // create "prelude" namespace
     , oldPrelude = {}
-    , functional = {}
       
       // Detect free variables "exports" and "global", for applying
       // different module load/require patterns in different environments
     , freeExports = typeof exports == 'object' && exports
     , freeGlobal = typeof global == 'object' && global
+    
+      // Require the functional lib if in Node.js environment
+    , functional = freeExports ? require('../FunctionalJS/functional') : window.functional
 
       // Helpers
       //+ isArray :: a -> Boolean
@@ -116,7 +118,7 @@
     , uniqBy = function(fun, xs) {
         var result = [], len = xs.length, fun = fun.toFunction();
         for(var i=0;i<len;i++ ) {
-          if(map(fun)(result).indexOf(fun(xs[i])) < 0) {
+          if(functional.map(fun)(result).indexOf(fun(xs[i])) < 0) {
             result.push(xs[i]);
           }
         };
@@ -130,7 +132,7 @@
           //destructive
           return xs.reverse();
         } else {
-          return reduce(function(x, acc){ return acc.concat(x); }, mempty, xs);
+          return functional.reduce(function(x, acc){ return acc.concat(x); }, mempty, xs);
         }
       }.autoCurry()
 
@@ -148,7 +150,7 @@
       }.autoCurry()
 
       //+ flatten :: [[a]] -> [a]
-    , flatten = reduce(function(a,b){return a.concat(b);}, [])
+    , flatten = functional.reduce(function(a,b){return a.concat(b);}, [])
 
       //+ sortBy :: (a -> b) -> [a] -> [a]
     , sortBy = function(fun, xs) {
@@ -306,7 +308,7 @@
       }.autoCurry()
 
       //+ sum :: [Number] -> Number
-    , sum = reduce('+', 0)
+    , sum = functional.reduce('+', 0)
 
       //+ div :: Number -> Number -> Number
     , div = function(x,y){ return x / y; }
@@ -324,7 +326,11 @@
     , repeat = function(arg, n) {	
         return nTimes(n, id.curry(arg));
       }.autoCurry()
-     
+
+    
+
+  // Add each function in functional.js directly to the namespace
+  functional.expose(prelude);
 
   // Add functions to the "prelude" namespace,
   prelude.isArray = isArray;
@@ -418,9 +424,6 @@
   // Check for "exports" after "define", in case a build optimizer adds
   // an "exports" object.
   else if (freeExports) {
-    // Require functional.js lib
-    functional = require('../FunctionalJS/functional');
-    
     // Node.js or RingoJS v0.8.0+
     if (typeof module == 'object' && module && module.exports == freeExports) {
       module.exports = prelude;

@@ -1,6 +1,3 @@
-functional = require('../../FunctionalJS/functional')
-functional.expose()
-
 prelude = require('../prelude')
 prelude.expose()
 
