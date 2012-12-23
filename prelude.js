@@ -8,7 +8,7 @@
     , freeGlobal = typeof global == 'object' && global
     
       // Require the functional lib if in Node.js environment
-    , functional = freeExports ? require('../FunctionalJS/functional') : window.functional
+    , functional = freeExports ? require('functionaljs') : window.functional
 
       // Helpers
       //+ isArray :: a -> Boolean
