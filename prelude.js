@@ -10,7 +10,12 @@
       // Require the functional lib if in Node.js environment
     , functional = freeExports ? require('functionaljs') : window.functional
 
-      // Helpers
+  // Helpers
+  //+ equals :: a -> a -> Bool
+    , equals = function(x, y) {
+        return x === y;
+      }.autoCurry()
+
       //+ isArray :: a -> Boolean
     , isArray = function(obj) {
         return (obj && obj.constructor == Array);
@@ -333,6 +338,7 @@
   functional.expose(prelude);
 
   // Add functions to the "prelude" namespace,
+  prelude.equals = equals;
   prelude.isArray = isArray;
   prelude.isObj = isObj;
   prelude.nTimes = nTimes;

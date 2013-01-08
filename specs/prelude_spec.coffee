@@ -15,6 +15,21 @@ describe('preludeJS', () ->
   )
 
   describe('helpers', () ->
+    describe "equals", ->
+      it "tests the equality of its arguments", ->
+        expect(equals(true, true)).toBeTruthy()
+        expect(equals(true, false)).toBeFalsy()
+        expect(equals(1, 1)).toBeTruthy()
+        expect(equals(1, 2)).toBeFalsy()
+        expect(equals('foo', 'foo')).toBeTruthy()
+        expect(equals('foo', 'bar')).toBeFalsy()
+
+      it "can be partially applied", ->
+        expect(equals(true)(true)).toBeTruthy()  
+        expect(equals()(true, true)).toBeTruthy()
+        expect(equals(true)(false)).toBeFalsy()
+        expect(equals()(true, false)).toBeFalsy()
+
     describe('isArray', ()->
       it('tests for Array', ()->
         expect(isArray([])).toBeTruthy()
